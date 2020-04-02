@@ -60,8 +60,10 @@ string CryptoppCommon::md5(std::string text)
 
 string CryptoppCommon::md5Decrypt(std::string text)
 {
-	std::string digest;
-	return digest;
+	CryptoPP::Weak1::MD5 md5;
+	string decode;
+    // StringSource(text, true, new HashFilter(md5, new HexDecoder(new StringSink(decode))));
+    return decode;
 }
 
 string CryptoppCommon::md5Source(std::string filename)
@@ -94,15 +96,6 @@ string CryptoppCommon::sha256Encode(string text)
 	string encode;
     StringSource(text, true, new HashFilter(sha256, new HexEncoder(new StringSink(encode))));
 
- //    string Digest;
- //    SHA256 sha256Tmp;
-	// int DigestSize = sha256Tmp.DigestSize();
-	// char* byDigest = new char[ DigestSize ];
-	// sha256Tmp.CalculateDigest((byte*)byDigest, (const byte *)text.c_str(), text.size());
-	// Digest = byDigest;
-	// delete []byDigest;
-	// byDigest = NULL;
-	// cout <<"Digest==========:" <<Digest << endl;
     return encode;
 }
 
@@ -132,4 +125,121 @@ void CryptoppCommon::GunzipFile(const char *in, const char *out)
 	FileSource(in, true, new Gunzip(new FileSink(out)));
 }
 
+SecByteBlock HexDecodeString(const char *hex)
+{
+	StringSource ss(hex, true, new HexDecoder);
+	SecByteBlock result((size_t)ss.MaxRetrievable());
+	ss.Get(result, result.size());
+	return result;
+}
+
+string CryptoppCommon::AESEncryptString(const char *hexKey, const char *hexIV, string text)
+{
+	string result;
+	// SecByteBlock key = HexDecodeString(hexKey);
+	// SecByteBlock iv = HexDecodeString(hexIV);
+	// byte iv[AES::BLOCKSIZE]="123456";
+
+    AES::Encryption aesEncryption((byte *)hexKey, AES::DEFAULT_KEYLENGTH);
+	CFB_Mode_ExternalCipher::Encryption cfbEncryption(aesEncryption, (byte*)hexIV);
+    StreamTransformationFilter cfbEncryptor(cfbEncryption, new HexEncoder(new StringSink(result)));
+    cfbEncryptor.Put((byte *)text.c_str(), text.length());
+    cfbEncryptor.MessageEnd();
+
+    return result;
+}
+
+
+string CryptoppCommon::AESDecryptString(const char *hexKey, const char *hexIV, string text)
+{
+	string result;
+	// SecByteBlock key = HexDecodeString(hexKey);
+	// SecByteBlock iv = HexDecodeString(hexIV);
+	// byte iv[AES::BLOCKSIZE]="123456";
+
+	CFB_Mode<AES >::Decryption cfbDecryption((byte *)hexKey, AES::DEFAULT_KEYLENGTH, (byte*)hexIV);
+    HexDecoder decryptor(new StreamTransformationFilter(cfbDecryption, new StringSink(result)));
+    decryptor.Put((byte *)text.c_str(), text.length());
+    decryptor.MessageEnd();
+	return result;
+}
+
+string CryptoppCommon::Hash256(string text, string key)
+{
+	string mac;
+	HMAC<SHA256> hmac((const byte*)key.data(), key.size());  
+    StringSource(text, true, new HashFilter(hmac, new StringSink(mac)));  
+ 
+    string encoder; 
+    StringSource(mac, true, new HexEncoder(new StringSink(encoder)));  
+    return encoder;
+}
+
+/*
+void CryptoppCommon::GenerateEccKeys(string& sPrivateKey, string& sPublicKey)
+{
+	using namespace CryptoPP;
+    // Random pool, the second parameter is the length of key
+    // 随机数池，第二个参数是生成密钥的长
+    AutoSeededRandomPool rnd(false, 256);
+    //AutoSeededRandomPool rnd;
+
+    ECIES<ECP>::PrivateKey  privateKey;
+    ECIES<ECP>::PublicKey   publicKey;
+    // Generate private key
+    // 生成私钥
+    privateKey.Initialize(rnd, ASN1::secp521r1());
+    // Generate public key using private key
+    // 用私钥生成密钥
+    privateKey.MakePublicKey(publicKey);
+
+    ECIES<ECP>::Encryptor encryptor(publicKey);
+    HexEncoder pubEncoder(new StringSink(sPublicKey));
+    //encryptor.DEREncode(pubEncoder);
+    publicKey.DEREncode(pubEncoder);
+    pubEncoder.MessageEnd();
+
+    ECIES<ECP>::Decryptor decryptor(privateKey);
+    HexEncoder prvEncoder(new StringSink(sPrivateKey));
+    // decryptor.DEREncode(prvEncoder);
+    privateKey.DEREncode(prvEncoder);
+    prvEncoder.MessageEnd();
+}
+
+string CryptoppCommon::EccEncrypt(const string& publicKey, const string& text)
+{
+	cout << "11111" << endl;
+    // If to save the keys into a file, FileSource should be replace StringSource
+    // 如果需要把密钥保存到文件里，可以用 FileSource
+    StringSource pubString(publicKey, true, new HexDecoder);
+    cout << "5555" << endl;
+    ECIES<ECP>::Encryptor encryptor(pubString);
+    cout << "222222" << endl;
+ 
+    // Calculate the length of cipher text
+    // 计算加密后密文的长度
+    size_t uiCipherTextSize = encryptor.CiphertextLength(text.length());
+    std::string sCipherText;
+    sCipherText.resize(uiCipherTextSize);
+    cout << "333333" << endl;
+    RandomPool rnd;
+    encryptor.Encrypt(rnd, (byte*)(text.c_str()), text.length(), (byte*)(sCipherText.data()));
+    cout << "4444" << endl;
+    return sCipherText;
+}
+
+string CryptoppCommon::EccDecrypt(const string& privateKey, const string& text)
+{
+
+    StringSource privString(privateKey, true, new HexDecoder);
+    ECIES<ECP>::Decryptor decryptor(privString);
+ 
+    auto sPlainTextLen = decryptor.MaxPlaintextLength(text.size());
+    std::string sDecryText;
+    sDecryText.resize(sPlainTextLen);
+    RandomPool rnd;
+    decryptor.Decrypt(rnd, (byte*)text.c_str(), text.size(), (byte*)sDecryText.data());
+    return sDecryText;
+}
+*/
 // NAMESPACE_END  // CryptoPP

@@ -1,13 +1,19 @@
 
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 
+#include "cryptopp/aes.h"
 #include "cryptopp/base64.h"
 #include "cryptopp/config.h"  
+#include "cryptopp/eccrypto.h" 
 #include "cryptopp/files.h"
 #include "cryptopp/filters.h"
 #include "cryptopp/gzip.h"
 #include "cryptopp/hex.h" 
+#include "cryptopp/hmac.h" 
 #include "cryptopp/md5.h" 
+#include "cryptopp/modes.h" 
+#include "cryptopp/oids.h" 
+#include "cryptopp/osrng.h" 
 #include "cryptopp/randpool.h"  
 #include "cryptopp/rsa.h" 
 #include "cryptopp/sha.h" 
@@ -50,7 +56,7 @@ public:
 	string md5(std::string text);
 
 	//------------------------   
-	// md5数据加密 
+	// md5数据解密 
 	//------------------------ 
 	string md5Decrypt(std::string text);
 
@@ -94,5 +100,33 @@ public:
 	// 解压文件 
 	//------------------------ 
 	void GunzipFile(const char *in, const char *out);
+
+	//------------------------   
+	// AES数据加密 
+	//------------------------ 
+	string AESEncryptString(const char *hexKey, const char *hexIV, string infile);
+
+	//------------------------   
+	// AES数据解密
+	//------------------------ 
+	string AESDecryptString(const char *hexKey, const char *hexIV, string infile);
+
+	//------------------------   
+	// hmacsha256
+	//------------------------ 
+	string Hash256(string text, string key);
+
+	//------------------------   
+	//生成 ECC 密钥对  
+	//------------------------ 
+	//void GenerateEccKeys(string& privateKey, string& publicKey);
+
+	//------------------------   
+	//ECC加密  
+	//------------------------ 
+    	//string EccEncrypt(const string& publicKey, const string& text);
+
+    	//ECC解密
+    	//string EccDecrypt(const string& privateKey, const string& text);
 };
 // NAMESPACE_END  // CryptoPP

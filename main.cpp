@@ -36,12 +36,12 @@ int main(int argc, char *argv[])
     cout<<"md5 test ==========="<<endl; 
     string md5Test = "md5Test";
     string md5Encrypt = item.md5(md5Test);
-    cout<<"md5 Encrypt Text:"<<md5Encrypt<<endl << endl; 
+    cout<<"md5Encrypt Text:"<<md5Encrypt<<endl << endl;
 
     cout<<"base64 test ==========="<<endl; 
     string base64Test = "baseTest";
     string encode = item.base64Encode(base64Test);
-    cout<<"base64encode Text:"<<encode<<endl; 
+    cout<<"base64encode Text:"<<encode; 
     string decode = item.base64Decode(encode);
     cout<<"base64decode Text:"<<decode<<endl << endl; 
 
@@ -49,19 +49,43 @@ int main(int argc, char *argv[])
     string sha256Test = "shaTest";
     string shaEncode = item.sha256Encode(sha256Test);
     cout<<"encode Text:"<<shaEncode<<endl; 
-    string shaDecode = item.sha256Decode(shaEncode);
-    cout<<"decode Text:"<<shaDecode<<endl << endl; 
+    // string shaDecode = item.sha256Decode(shaEncode);
+    // cout<<"decode Text:"<<shaDecode<<endl << endl; 
 
-    cout<<"zip test ==========="<<endl; 
-    string srcFile = "README.md";
-    string zipFile = "test.tar.gz";
-    string unzipFile = "t.md";
-    cout<<"zipFile Name:"<<zipFile<<endl;  
-    item.zipFile(srcFile, zipFile);
-    cout<<"unzipFile Name:"<<unzipFile << endl;
-    item.GunzipFile(zipFile.c_str(), unzipFile.c_str());
-    cout << "11111" << endl;
+    // cout<<"zip test ==========="<<endl; 
+    // string srcFile = "README.md";
+    // string zipFile = "test.tar.gz";
+    // string unzipFile = "t.md";
+    // cout<<"zipFile Name:"<<zipFile<<endl;  
+    // item.zipFile(srcFile, zipFile);
+    // cout<<"unzipFile Name:"<<unzipFile << endl;
+    // item.GunzipFile(zipFile.c_str(), unzipFile.c_str());
     
+    cout<<"aes test ==========="<<endl; 
+    string keyAes = "123456";
+    string iv = "abcd";
+    string aesTest = "aesTest";
+    string aesEncode = item.AESEncryptString(keyAes.c_str(), iv.c_str(), aesTest);
+    cout<<"aes encode Text:"<<aesEncode <<endl; 
+    iv = "abcd";
+    string aesDecode = item.AESDecryptString(keyAes.c_str(), iv.c_str(), aesEncode);
+    cout<<"aes decode Text:"<<aesDecode <<endl << endl; 
 
+    cout<<"hmacsha256 test ==========="<<endl; 
+    string hmacTest = "hmacTest";
+    string keyHmac = "123456";
+    string hmacEncrypt = item.Hash256(keyHmac, hmacTest);
+    cout<<"hmacEncrypt Text:"<<hmacEncrypt <<endl << endl; 
+    /*
+    std::string sPrivateKey, sPublicKey;
+    item.GenerateEccKeys(sPrivateKey, sPublicKey);
+    string eccMsg = "EccTest";
+    cout << "sPrivateKey:" << sPrivateKey << endl;
+    cout << "sPublickey:" << sPublicKey << endl;
+    string EccEncryptedText = item.EccEncrypt(sPrivateKey, eccMsg);
+    cout<<"EccEncryptedText Text:"<<EccEncryptedText<<endl;   
+    string EccDecryptedText = item.EccDecrypt(sPrivateKey, EccEncryptedText);  
+    cout<<"EccDecryptedText Text:"<<EccDecryptedText<<endl << endl;
+    */
 	return 0;
 }
